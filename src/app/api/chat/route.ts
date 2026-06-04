@@ -5,34 +5,9 @@ export const dynamic = 'force-dynamic';
 
 interface ChatMessage { role: string; content: string; }
 
-// ---------- Demo mode ----------
-const DEMO_STORE = {
-  id: 'demo',
-  name: 'Demo Store',
-  greeting: "Hi! I'm Navi — your shopping assistant. What are you looking for today?",
-  primaryColor: '#6366f1',
-};
-
-const DEMO_PRODUCTS = [
-  { id: '1', name: 'Classic White Sneakers', price: 79, category: 'Footwear', description: 'Clean everyday sneakers', imageUrl: null, url: null, inStock: true },
-  { id: '2', name: 'Wireless Headphones', price: 129, category: 'Electronics', description: 'Noise-cancelling over-ear', imageUrl: null, url: null, inStock: true },
-  { id: '3', name: 'Leather Wallet', price: 45, category: 'Accessories', description: 'Slim bifold leather wallet', imageUrl: null, url: null, inStock: true },
-  { id: '4', name: 'Yoga Mat', price: 35, category: 'Sports', description: 'Non-slip premium mat', imageUrl: null, url: null, inStock: true },
-];
 
 // ---------- Product search ----------
 async function searchProducts(storeId: string, query?: string, maxPrice?: number, category?: string, limit = 6) {
-  if (storeId === 'demo') {
-    return DEMO_PRODUCTS.filter((p) => {
-      if (maxPrice && p.price > maxPrice) return false;
-      if (category && !p.category.toLowerCase().includes(category.toLowerCase())) return false;
-      if (query) {
-        const q = query.toLowerCase();
-        return p.name.toLowerCase().includes(q) || (p.description ?? '').toLowerCase().includes(q);
-      }
-      return true;
-    }).slice(0, limit);
-  }
   const where: Record<string, unknown> = { storeId, inStock: true };
   if (query) where.OR = [{ name: { contains: query, mode: 'insensitive' } }, { description: { contains: query, mode: 'insensitive' } }];
   if (maxPrice) where.price = { lte: maxPrice };
@@ -168,9 +143,9 @@ export async function POST(req: NextRequest) {
   const apiKey = req.headers.get('x-api-key') ?? req.nextUrl.searchParams.get('key');
   if (!apiKey) return Response.json({ error: 'Missing API key' }, { status: 401 });
 
-  const isDemo = apiKey === 'demo';
-  const store = isDemo ? DEMO_STORE : await prisma.store.findUnique({ where: { apiKey } });
+  const store = await prisma.store.findUnique({ where: { apiKey } });
   if (!store) return Response.json({ error: 'Invalid API key' }, { status: 401 });
+  const isDemo = false;
 
   const { messages, sessionId } = await req.json() as { messages: ChatMessage[]; sessionId: string };
   // Sanitise: keep only role + content (strip any file blobs that leaked through)

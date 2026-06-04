@@ -550,9 +550,11 @@ function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }:
 }
 
 export default function WidgetPage() {
+  const apiKey = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('key') : null;
+  if (!apiKey) return null;
   return (
     <NaviWidget
-      apiKey={typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('key') ?? 'demo' : 'demo'}
+      apiKey={apiKey}
       apiUrl={process.env.NEXT_PUBLIC_APP_URL}
       primaryColor="#6366f1"
       greeting="Hi! I'm Navi — your shopping assistant. What are you looking for today?"

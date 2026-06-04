@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     totalMessages,
     avgMessagesPerConvo: totalConversations ? Math.round(totalMessages / totalConversations) : 0,
     dailyActivity: Object.entries(dayMap).map(([date, count]) => ({ date, count })),
-    recentConversations: recentConversations.map((c) => ({
+    recentConversations: recentConversations.map((c: { id: string; sessionId: string; createdAt: Date; messages: { content: string }[] }) => ({
       id: c.id,
       sessionId: c.sessionId,
       createdAt: c.createdAt,

@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Compass, X, Maximize2, Minimize2, Square, Paperclip, Mic, MicOff,
   Send, Copy, Check, ShoppingBag, Headphones, ArrowRight, RotateCcw, Languages,
@@ -549,8 +550,10 @@ function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }:
   );
 }
 
-export default function WidgetPage() {
-  const apiKey = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('key') : null;
+
+function WidgetInner() {
+  const params = useSearchParams();
+  const apiKey = params.get('key');
   if (!apiKey) return null;
   return (
     <NaviWidget
@@ -559,5 +562,13 @@ export default function WidgetPage() {
       primaryColor="#6366f1"
       greeting="Hi! I'm Navi — your shopping assistant. What are you looking for today?"
     />
+  );
+}
+
+export default function WidgetPage() {
+  return (
+    <Suspense fallback={null}>
+      <WidgetInner />
+    </Suspense>
   );
 }

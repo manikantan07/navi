@@ -176,7 +176,7 @@ function CopyButton({ text }: { text: string }) {
 // ── Main widget ────────────────────────────────────────────────────────────
 
 function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }: NaviWidgetProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -345,7 +345,7 @@ function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }:
   const h = expanded ? 680 : 520;
 
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', position: 'fixed', bottom: 20, right: 20, zIndex: 9999 }}>
+    <div style={{ fontFamily: 'system-ui, sans-serif', width: '100%', height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <style>{`
         @keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
         @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
@@ -355,7 +355,7 @@ function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }:
       `}</style>
 
       {open && (
-        <div dir={t.dir} style={{ width: w, height: h, background: '#fff', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.15)', display: 'flex', flexDirection: 'column', overflow: 'hidden', marginBottom: 12, transition: 'width 0.2s, height 0.2s' }}>
+        <div dir={t.dir} style={{ flex: 1, background: '#fff', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
           {/* Header */}
           <div style={{ background: color, color: '#fff', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
@@ -398,10 +398,6 @@ function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }:
                   <Square size={13} />
                 </button>
               )}
-              <button onClick={() => setOpen(false)} title="Close"
-                style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X size={15} />
-              </button>
             </div>
           </div>
 
@@ -541,11 +537,6 @@ function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }:
         </div>
       )}
 
-      {/* Launcher button */}
-      <button onClick={() => setOpen((v) => !v)}
-        style={{ width: 56, height: 56, borderRadius: '50%', background: color, color: '#fff', border: 'none', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.15s' }}>
-        {open ? <X size={22} /> : <Compass size={22} />}
-      </button>
     </div>
   );
 }

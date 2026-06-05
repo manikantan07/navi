@@ -178,6 +178,12 @@ function CopyButton({ text }: { text: string }) {
 function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }: NaviWidgetProps) {
   const [open, setOpen] = useState(true);
   const [expanded, setExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    const next = !expanded;
+    setExpanded(next);
+    window.parent.postMessage({ type: 'navi-resize', expanded: next }, '*');
+  };
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -388,7 +394,7 @@ function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }:
                   </div>
                 )}
               </div>
-              <button onClick={() => setExpanded((v) => !v)} title={expanded ? 'Collapse' : 'Expand'}
+              <button onClick={toggleExpand} title={expanded ? 'Collapse' : 'Expand'}
                 style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', cursor: 'pointer', width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {expanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
               </button>

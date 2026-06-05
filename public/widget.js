@@ -33,6 +33,17 @@
   frame.allow = 'autoplay';
   document.body.appendChild(frame);
 
+  window.addEventListener('message', function (e) {
+    if (!e.data || e.data.type !== 'navi-resize') return;
+    if (e.data.expanded) {
+      frame.style.width = '680px';
+      frame.style.height = '780px';
+    } else {
+      frame.style.width = '380px';
+      frame.style.height = '600px';
+    }
+  });
+
   var open = false;
   btn.addEventListener('click', function () {
     open = !open;

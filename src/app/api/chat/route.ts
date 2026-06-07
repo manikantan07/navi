@@ -147,6 +147,12 @@ export async function POST(req: NextRequest) {
   if (!store) return Response.json({ error: 'Invalid API key' }, { status: 401 });
   const isDemo = false;
 
+  // Trial enforcement
+  const hasOwnKey = !!(store as { openaiKey?: string | null }).openaiKey;
+  if (!hasOwnKey && store.trialChats >= store.trialLimit) {
+    return Response.json({ error: 'trial_exhausted' }, { status: 402 });
+  }
+
   const { messages, sessionId } = await req.json() as { messages: ChatMessage[]; sessionId: string };
   // Sanitise: keep only role + content (strip any file blobs that leaked through)
   const safeMessages = messages.map(({ role, content }) => ({ role, content }));
@@ -177,6 +183,10 @@ export async function POST(req: NextRequest) {
                 { conversationId: convo.id, role: 'assistant', content: fullText },
               ],
             });
+            // Count trial usage only when using platform key
+            if (!hasOwnKey) {
+              await prisma.store.update({ where: { id: store.id }, data: { trialChats: { increment: 1 } } });
+            }
           }
         } else {
           // Rule-based fallback

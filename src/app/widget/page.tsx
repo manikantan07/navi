@@ -176,7 +176,7 @@ function CopyButton({ text }: { text: string }) {
 // ── Main widget ────────────────────────────────────────────────────────────
 
 function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }: NaviWidgetProps) {
-  const [open, setOpen] = useState(true);
+  const open = true;
   const [expanded, setExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -309,6 +309,12 @@ function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }:
         body: JSON.stringify({ messages: history, sessionId }),
       });
 
+      if (res.status === 402) {
+        setMessages((prev) => { const n = [...prev]; n[n.length - 1] = { ...n[n.length - 1], content: '🔒 Free trial ended. The store owner needs to add an API key to continue.' }; return n; });
+        setLoading(false);
+        return;
+      }
+
       const reader = res.body?.getReader();
       if (!reader) throw new Error('No stream');
       const decoder = new TextDecoder();
@@ -346,9 +352,6 @@ function NaviWidget({ apiKey, apiUrl = '', primaryColor = '#6366f1', greeting }:
       setLoading(false);
     }
   }, [input, pendingFile, loading, sessionEnded, messages, apiKey, apiUrl, sessionId, greeting]);
-
-  const w = expanded ? 560 : 360;
-  const h = expanded ? 680 : 520;
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', width: '100%', height: '100vh', display: 'flex', flexDirection: 'column' }}>

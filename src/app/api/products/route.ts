@@ -40,6 +40,35 @@ export async function POST(req: NextRequest) {
   return Response.json(product);
 }
 
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const body = await req.json();
+  const { id, ...fields } = body;
+  if (!id) return Response.json({ error: 'id required' }, { status: 400 });
+
+  const product = await prisma.product.findUnique({ where: { id } });
+  if (!product) return Response.json({ error: 'Not found' }, { status: 404 });
+
+  const store = await verifyStoreOwner(product.storeId, session.user.id);
+  if (!store) return Response.json({ error: 'Forbidden' }, { status: 403 });
+
+  const updated = await prisma.product.update({
+    where: { id },
+    data: {
+      ...(fields.name !== undefined && { name: fields.name }),
+      ...(fields.description !== undefined && { description: fields.description }),
+      ...(fields.price !== undefined && { price: parseFloat(fields.price) }),
+      ...(fields.category !== undefined && { category: fields.category }),
+      ...(fields.imageUrl !== undefined && { imageUrl: fields.imageUrl }),
+      ...(fields.url !== undefined && { url: fields.url }),
+      ...(fields.inStock !== undefined && { inStock: fields.inStock }),
+    },
+  });
+  return Response.json(updated);
+}
+
 export async function DELETE(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return Response.json({ error: 'Unauthorized' }, { status: 401 });
